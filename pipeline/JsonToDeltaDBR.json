@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "JsonLkp",
+				"name": "JsonLookup",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -38,7 +38,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "JsonLkp",
+						"activity": "JsonLookup",
 						"dependencyConditions": [
 							"Succeeded"
 						]
