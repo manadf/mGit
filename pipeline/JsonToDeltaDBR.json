@@ -47,7 +47,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('JsonLkp').output.value",
+						"value": "@activity('JsonLookup').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
