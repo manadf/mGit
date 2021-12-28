@@ -5,17 +5,44 @@
 		"factoryName": {
 			"value": "mdf01"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
 		"DB01_connectionString": {
 			"value": ""
 		},
 		"DBS_accessToken": {
 			"value": ""
 		},
+		"ParaGen2_accountKey": {
+			"value": ""
+		},
 		"msa01_accountKey": {
 			"value": ""
 		},
+		"msa02_accountKey": {
+			"value": ""
+		},
+		"MyVaultLink_properties_typeProperties_baseUrl": {
+			"value": "https://ManSVault.vault.azure.net/"
+		},
+		"ParaGen2_properties_typeProperties_url": {
+			"value": "https://msa01.dfs.core.windows.net"
+		},
 		"msa01_properties_typeProperties_url": {
 			"value": "https://msa01.dfs.core.windows.net"
+		},
+		"msa02_properties_typeProperties_url": {
+			"value": "https://msa02.dfs.core.windows.net"
+		},
+		"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+			"value": "msql.database.windows.net"
+		},
+		"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+			"value": "msql"
+		},
+		"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+			"value": ""
 		}
 	}
 }

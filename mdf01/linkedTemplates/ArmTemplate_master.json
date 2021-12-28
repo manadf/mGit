@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "mdf01"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
 		"DB01_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'DB01'"
@@ -15,13 +19,44 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'DBS'"
 		},
+		"ParaGen2_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ParaGen2'"
+		},
 		"msa01_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'msa01'"
 		},
+		"msa02_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'msa02'"
+		},
+		"MyVaultLink_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://ManSVault.vault.azure.net/"
+		},
+		"ParaGen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://msa01.dfs.core.windows.net"
+		},
 		"msa01_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://msa01.dfs.core.windows.net"
+		},
+		"msa02_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://msa02.dfs.core.windows.net"
+		},
+		"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+			"type": "string",
+			"defaultValue": "msql.database.windows.net"
+		},
+		"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+			"type": "string",
+			"defaultValue": "msql"
+		},
+		"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+			"type": "secureString"
 		},
 		"containerUri": {
 			"type": "string",
@@ -50,21 +85,88 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureBlobStorage1_connectionString": {
+						"value": "[parameters('AzureBlobStorage1_connectionString')]"
+					},
 					"DB01_connectionString": {
 						"value": "[parameters('DB01_connectionString')]"
 					},
 					"DBS_accessToken": {
 						"value": "[parameters('DBS_accessToken')]"
 					},
+					"ParaGen2_accountKey": {
+						"value": "[parameters('ParaGen2_accountKey')]"
+					},
 					"msa01_accountKey": {
 						"value": "[parameters('msa01_accountKey')]"
 					},
+					"msa02_accountKey": {
+						"value": "[parameters('msa02_accountKey')]"
+					},
+					"MyVaultLink_properties_typeProperties_baseUrl": {
+						"value": "[parameters('MyVaultLink_properties_typeProperties_baseUrl')]"
+					},
+					"ParaGen2_properties_typeProperties_url": {
+						"value": "[parameters('ParaGen2_properties_typeProperties_url')]"
+					},
 					"msa01_properties_typeProperties_url": {
 						"value": "[parameters('msa01_properties_typeProperties_url')]"
+					},
+					"msa02_properties_typeProperties_url": {
+						"value": "[parameters('msa02_properties_typeProperties_url')]"
+					},
+					"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+						"value": "[parameters('SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint')]"
+					},
+					"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+						"value": "[parameters('SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName')]"
+					},
+					"SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+						"value": "[parameters('SSIStoAzure_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "mdf01_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'mdf01_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "mdf01_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'mdf01_ArmTemplate_1')]"
+			]
 		}
 	]
 }
