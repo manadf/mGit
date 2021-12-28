@@ -1,0 +1,60 @@
+{
+	"name": "UnionBranch",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ParaCon2Union",
+						"type": "DatasetReference"
+					},
+					"name": "Group1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaCon2Union",
+						"type": "DatasetReference"
+					},
+					"name": "Group2"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaCon2Union",
+						"type": "DatasetReference"
+					},
+					"name": "Group3"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "OrdersNorthwind"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "UnionDB"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaCon2",
+						"type": "DatasetReference"
+					},
+					"name": "GroupUnion"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Union1"
+				}
+			],
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tignoreNoFilesFound: false) ~> Group1\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tignoreNoFilesFound: false) ~> Group2\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tignoreNoFilesFound: false) ~> Group3\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrdersNorthwind\nGroup1, Group2, Group3, OrdersNorthwind union(byName: true)~> Union1\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> UnionDB\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['UnionGroup.csv'],\n\tumask: 0022,\n\tpreCommands: [],\n\tpostCommands: [],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> GroupUnion"
+		}
+	}
+}

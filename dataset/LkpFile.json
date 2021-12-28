@@ -1,5 +1,5 @@
 {
-	"name": "JsonLkp",
+	"name": "LkpFile",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "msa01",
@@ -10,18 +10,16 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "JsonLkp.csv",
-				"folderPath": "Bronze",
-				"fileSystem": "con1"
+				"fileName": "LkpFile.txt",
+				"folderPath": "Lookup",
+				"fileSystem": "con2"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": [
-			{
-				"type": "String"
-			},
 			{
 				"type": "String"
 			},

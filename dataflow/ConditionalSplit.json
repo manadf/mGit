@@ -1,0 +1,59 @@
+{
+	"name": "ConditionalSplit",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "POH",
+						"type": "DatasetReference"
+					},
+					"name": "POH"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "POHQ1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "POHQ2"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "POHQ3"
+				},
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "POHQ4"
+				}
+			],
+			"transformations": [
+				{
+					"name": "YMQ"
+				},
+				{
+					"name": "Year2012"
+				},
+				{
+					"name": "ConditionalSplitQtr"
+				}
+			],
+			"script": "source(output(\n\t\tPurchaseOrderID as integer,\n\t\tRevisionNumber as integer,\n\t\tStatus as integer,\n\t\tEmployeeID as integer,\n\t\tVendorID as integer,\n\t\tShipMethodID as integer,\n\t\tOrderDate as timestamp,\n\t\tShipDate as timestamp,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4),\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> POH\nPOH derive(Year = year(OrderDate),\n\t\tQuarter = case(month(OrderDate) > 4, 'Q1', month(OrderDate) > 7, 'Q2',month(OrderDate) > 10, 'Q3','Q4'),\n\t\tMonth = month(OrderDate)) ~> YMQ\nYMQ filter(Year == 2012) ~> Year2012\nYear2012 split(Quarter == 'Q1',\n\tQuarter == 'Q2',\n\tQuarter == 'Q3',\n\tdisjoint: false) ~> ConditionalSplitQtr@(Q1, Q2, Q3, Q4)\nConditionalSplitQtr@Q1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> POHQ1\nConditionalSplitQtr@Q2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> POHQ2\nConditionalSplitQtr@Q3 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> POHQ3\nConditionalSplitQtr@Q4 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> POHQ4"
+		}
+	}
+}

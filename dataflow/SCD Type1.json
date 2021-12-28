@@ -1,0 +1,45 @@
+{
+	"name": "SCD Type1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "OrdSrc",
+						"type": "DatasetReference"
+					},
+					"name": "OrdSrc"
+				},
+				{
+					"dataset": {
+						"referenceName": "OrdTar",
+						"type": "DatasetReference"
+					},
+					"name": "OrdTar"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OrdTar",
+						"type": "DatasetReference"
+					},
+					"name": "UpsertOrdTar"
+				}
+			],
+			"transformations": [
+				{
+					"name": "OrdTarLkp"
+				},
+				{
+					"name": "SrcTarCompare"
+				},
+				{
+					"name": "UpsertRecords"
+				}
+			],
+			"script": "source(output(\n\t\tOrderID as integer,\n\t\tCustomerID as string,\n\t\tEmployeeID as integer,\n\t\tOrderDate as timestamp,\n\t\tOrdAmt as decimal(19,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrdSrc\nsource(output(\n\t\tOrderID as integer,\n\t\tCustomerID as string,\n\t\tEmployeeID as integer,\n\t\tOrderDate as timestamp,\n\t\tOrdAmt as decimal(19,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrdTar\nOrdTar select(mapColumn(\n\t\tOrderID_Lkp = OrderID,\n\t\tCustomerID_Lkp = CustomerID,\n\t\tEmployeeID_Lkp = EmployeeID,\n\t\tOrderDate_Lkp = OrderDate,\n\t\tOrdAmt_Lkp = OrdAmt\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> OrdTarLkp\nOrdSrc, OrdTarLkp lookup(OrderID == OrderID_Lkp,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> SrcTarCompare\nSrcTarCompare alterRow(upsertIf(true())) ~> UpsertRecords\nUpsertRecords sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tOrderID as integer,\n\t\tCustomerID as string,\n\t\tEmployeeID as integer,\n\t\tOrderDate as timestamp,\n\t\tOrdAmt as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['OrderID'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tOrderID,\n\t\tCustomerID,\n\t\tEmployeeID,\n\t\tOrderDate,\n\t\tOrdAmt\n\t)) ~> UpsertOrdTar"
+		}
+	}
+}

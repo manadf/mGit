@@ -1,0 +1,55 @@
+{
+	"name": "MergeJoin",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "POH",
+						"type": "DatasetReference"
+					},
+					"name": "POH"
+				},
+				{
+					"dataset": {
+						"referenceName": "POD",
+						"type": "DatasetReference"
+					},
+					"name": "POD"
+				},
+				{
+					"dataset": {
+						"referenceName": "Product",
+						"type": "DatasetReference"
+					},
+					"name": "Product"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "PurchaseOrderFact"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PurchaseOrderID"
+				},
+				{
+					"name": "POHPOD"
+				},
+				{
+					"name": "ProductID"
+				},
+				{
+					"name": "ProductSelect"
+				}
+			],
+			"script": "source(output(\n\t\tPurchaseOrderID as integer,\n\t\tRevisionNumber as integer,\n\t\tStatus as integer,\n\t\tEmployeeID as integer,\n\t\tVendorID as integer,\n\t\tShipMethodID as integer,\n\t\tOrderDate as timestamp,\n\t\tShipDate as timestamp,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4),\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> POH\nsource(output(\n\t\tPurchaseOrderID as integer,\n\t\tModifiedDate as timestamp,\n\t\tPurchaseOrderDetailID as integer,\n\t\tDueDate as timestamp,\n\t\tOrderQty as integer,\n\t\tProductID as integer,\n\t\tUnitPrice as decimal(19,4),\n\t\tLineTotal as decimal(19,4),\n\t\tReceivedQty as decimal(8,2),\n\t\tRejectedQty as decimal(8,2),\n\t\tStockedQty as decimal(9,2)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> POD\nsource(output(\n\t\tModifiedDate as timestamp,\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tMakeFlag as boolean,\n\t\tFinishedGoodsFlag as boolean,\n\t\tColor as string,\n\t\tSafetyStockLevel as integer,\n\t\tReorderPoint as integer,\n\t\tStandardCost as decimal(19,4),\n\t\tListPrice as decimal(19,4),\n\t\tSize as string,\n\t\tSizeUnitMeasureCode as string,\n\t\tWeightUnitMeasureCode as string,\n\t\tWeight as decimal(8,2),\n\t\tDaysToManufacture as integer,\n\t\tProductLine as string,\n\t\tClass as string,\n\t\tStyle as string,\n\t\tProductSubcategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as timestamp,\n\t\tSellEndDate as timestamp,\n\t\tDiscontinuedDate as timestamp,\n\t\trowguid as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Product\nPOH, POD join(POH@PurchaseOrderID == POD@PurchaseOrderID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> PurchaseOrderID\nPurchaseOrderID select(mapColumn(\n\t\tPurchaseOrderID = POH@PurchaseOrderID,\n\t\tRevisionNumber,\n\t\tStatus,\n\t\tEmployeeID,\n\t\tVendorID,\n\t\tShipMethodID,\n\t\tOrderDate,\n\t\tShipDate,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tModifiedDate = POH@ModifiedDate,\n\t\tPurchaseOrderID = POD@PurchaseOrderID,\n\t\tModifiedDate = POD@ModifiedDate,\n\t\tDueDate,\n\t\tOrderQty,\n\t\tProductID,\n\t\tUnitPrice,\n\t\tLineTotal,\n\t\tReceivedQty,\n\t\tRejectedQty,\n\t\tStockedQty\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> POHPOD\nPOHPOD, ProductSelect join(POHPOD@ProductID == ProductSelect@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> ProductID\nProduct select(mapColumn(\n\t\tProductID,\n\t\tStandardCost\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ProductSelect\nProductID sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> PurchaseOrderFact"
+		}
+	}
+}

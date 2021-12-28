@@ -1,0 +1,35 @@
+{
+	"name": "EmpSrcType2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DB01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "EmpID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EmpName",
+				"type": "varchar"
+			},
+			{
+				"name": "Dept",
+				"type": "varchar"
+			},
+			{
+				"name": "StartDate",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "EmpSrc_Type2"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

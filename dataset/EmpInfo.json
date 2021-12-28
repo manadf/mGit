@@ -1,8 +1,8 @@
 {
-	"name": "JsonLkp",
+	"name": "EmpInfo",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "msa01",
+			"referenceName": "msa02",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,22 +10,33 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "JsonLkp.csv",
-				"folderPath": "Bronze",
+				"fileName": "EmpInfo.csv",
 				"fileSystem": "con1"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": [
 			{
+				"name": "EmpID",
 				"type": "String"
 			},
 			{
+				"name": "EmpName",
 				"type": "String"
 			},
 			{
+				"name": "Gender",
+				"type": "String"
+			},
+			{
+				"name": "Salary",
+				"type": "String"
+			},
+			{
+				"name": "Dept",
 				"type": "String"
 			}
 		]

@@ -1,0 +1,26 @@
+{
+	"name": "WaterMarkTbl",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DB01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "TableName",
+				"type": "varchar"
+			},
+			{
+				"name": "WatermarkValue",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "WatermarkTable"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,54 @@
+{
+	"name": "UnionBranch",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "UnionBranch",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"Group1": {
+								"fileName": "Group1.txt"
+							},
+							"Group2": {
+								"fileName": "Group2.txt"
+							},
+							"Group3": {
+								"fileName": "Group3.txt"
+							},
+							"OrdersNorthwind": {
+								"tableName": "Orders_Northwind"
+							},
+							"UnionDB": {
+								"tableName": "UnionDB"
+							},
+							"GroupUnion": {
+								"folder": "Union"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-12-23T20:21:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,35 @@
+{
+	"name": "AggrDerivedColumn",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "POH",
+						"type": "DatasetReference"
+					},
+					"name": "POH"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ParaDB01",
+						"type": "DatasetReference"
+					},
+					"name": "POFactAvg"
+				}
+			],
+			"transformations": [
+				{
+					"name": "YearMonthQuarter"
+				},
+				{
+					"name": "Avg"
+				}
+			],
+			"script": "source(output(\n\t\tPurchaseOrderID as integer,\n\t\tRevisionNumber as integer,\n\t\tStatus as integer,\n\t\tEmployeeID as integer,\n\t\tVendorID as integer,\n\t\tShipMethodID as integer,\n\t\tOrderDate as timestamp,\n\t\tShipDate as timestamp,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4),\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> POH\nPOH derive(Year = year(OrderDate),\n\t\tQuarter = case(month(OrderDate) >= 1 && month(OrderDate) <= 3, 'Q1',\r\n    month(OrderDate) >= 4 && month(OrderDate) <= 6, 'Q2',\r\n    month(OrderDate) >= 7 && month(OrderDate) <= 9, 'Q3', 'Q4'  \r\n),\n\t\tMonth = month(OrderDate)) ~> YearMonthQuarter\nYearMonthQuarter aggregate(groupBy(Year,\n\t\tQuarter,\n\t\tMonth,\n\t\tEmployeeID,\n\t\tVendorID),\n\t{Avg(SubTotal)} = avg(SubTotal),\n\t\t{Avg(TaxAmt)} = avg(TaxAmt),\n\t\t{Avg(Freight)} = avg(Freight),\n\t\t{Avg(TotalDue)} = avg(TotalDue)) ~> Avg\nAvg sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tYear,\n\t\tQuarter,\n\t\tMonth,\n\t\tEmployeeID,\n\t\tVendorID,\n\t\t{Avg(SubTotal)},\n\t\t{Avg(TaxAmt)},\n\t\t{Avg(Freight)},\n\t\t{Avg(TotalDue)}\n\t)) ~> POFactAvg"
+		}
+	}
+}

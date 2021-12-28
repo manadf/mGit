@@ -1,0 +1,48 @@
+{
+	"name": "ConditionalSplitQtr",
+	"properties": {
+		"activities": [
+			{
+				"name": "ConditionalSplit",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "ConditionalSplit",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"POHQ1": {
+								"tableName": "POH_Q1"
+							},
+							"POHQ2": {
+								"tableName": "POH_Q2"
+							},
+							"POHQ3": {
+								"tableName": "POH_Q3"
+							},
+							"POHQ4": {
+								"tableName": "POH_Q4"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-12-23T20:21:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

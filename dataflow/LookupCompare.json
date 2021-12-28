@@ -1,0 +1,45 @@
+{
+	"name": "LookupCompare",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "OrdSrc",
+						"type": "DatasetReference"
+					},
+					"name": "OrdersSrc"
+				},
+				{
+					"dataset": {
+						"referenceName": "OrdTar",
+						"type": "DatasetReference"
+					},
+					"name": "OrdersTar"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OrdTar",
+						"type": "DatasetReference"
+					},
+					"name": "OrdertarSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectTar"
+				},
+				{
+					"name": "Lookup1"
+				},
+				{
+					"name": "Filter1"
+				}
+			],
+			"script": "source(output(\n\t\tOrderID as integer,\n\t\tCustomerID as string,\n\t\tEmployeeID as integer,\n\t\tOrderDate as timestamp,\n\t\tOrdAmt as decimal(19,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrdersSrc\nsource(output(\n\t\tOrderID as integer,\n\t\tCustomerID as string,\n\t\tEmployeeID as integer,\n\t\tOrderDate as timestamp,\n\t\tOrdAmt as decimal(19,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> OrdersTar\nOrdersTar select(mapColumn(\n\t\tOrderID_Lkp = OrderID,\n\t\tCustomerID_Lkp = CustomerID,\n\t\tEmployeeID_Lkp = EmployeeID,\n\t\tOrderDate_Lkp = OrderDate,\n\t\tOrdAmt_Lkp = OrdAmt\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectTar\nOrdersSrc, SelectTar lookup(OrderID == OrderID_Lkp,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 filter(isNull(OrderID_Lkp)) ~> Filter1\nFilter1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tOrderID as integer,\n\t\tCustomerID as string,\n\t\tEmployeeID as integer,\n\t\tOrderDate as timestamp,\n\t\tOrdAmt as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> OrdertarSink"
+		}
+	}
+}
