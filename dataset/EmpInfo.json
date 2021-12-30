@@ -1,6 +1,10 @@
 {
 	"name": "EmpInfo",
 	"properties": {
+		"linkedServiceName": {
+			"referenceName": "msa01",
+			"type": "LinkedServiceReference"
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
